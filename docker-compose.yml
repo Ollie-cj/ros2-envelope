@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   ros2_dev:
     build:
@@ -11,15 +9,16 @@ services:
       # Persistent volumes for build artifacts
       - ros2_build:/ros2_ws/build
       - ros2_install:/ros2_ws/install
-      # X11 socket for GUI applications
-      - /tmp/.X11-unix:/tmp/.X11-unix
+    # Windows doesn't support host network mode, so we expose ports instead
+    ports:
+      - "11311:11311"  # For ROS master
+      - "9090:9090"    # For rosbridge (if used)
     environment:
-      # For GUI applications
-      - DISPLAY=${DISPLAY}
-      - QT_X11_NO_MITSHM=1
       # ROS2 environment
       - ROS_DOMAIN_ID=0
-    network_mode: "host"  # Simplifies ROS2 node discovery
+    # Use bridge network instead of host for Windows compatibility
+    networks:
+      - ros2_net
     command: bash
     stdin_open: true  # Keep STDIN open
     tty: true  # Allocate a pseudo-TTY
@@ -27,3 +26,7 @@ services:
 volumes:
   ros2_build:
   ros2_install:
+
+networks:
+  ros2_net:
+    driver: bridge
