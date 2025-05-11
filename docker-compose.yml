@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  ros2_dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      # Mount source code
+      - ./src:/ros2_ws/src
+      # Persistent volumes for build artifacts
+      - ros2_build:/ros2_ws/build
+      - ros2_install:/ros2_ws/install
+      # X11 socket for GUI applications
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    environment:
+      # For GUI applications
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      # ROS2 environment
+      - ROS_DOMAIN_ID=0
+    network_mode: "host"  # Simplifies ROS2 node discovery
+    command: bash
+    stdin_open: true  # Keep STDIN open
+    tty: true  # Allocate a pseudo-TTY
+
+volumes:
+  ros2_build:
+  ros2_install:
