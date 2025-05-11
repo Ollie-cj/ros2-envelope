@@ -13,7 +13,7 @@ find_package(geometry_msgs REQUIRED)
 
 # Add include directories
 include_directories(
-  include
+  headers
 )
 
 # Create the safety envelope library
@@ -22,7 +22,7 @@ add_library(${PROJECT_NAME}
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/headers>
   $<INSTALL_INTERFACE:include>
 )
 
@@ -43,7 +43,7 @@ install(
 
 # Install header files
 install(
-  FILES safety_envelope.hpp
+  FILES headers/safety_envelope.hpp
   DESTINATION include/${PROJECT_NAME}
 )
 

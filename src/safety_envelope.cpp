@@ -15,6 +15,6 @@
  * and prevent the robot tooltip from leaving the designated safe operational area.
  */
 
-#include "safety_envelope.hpp"
+#include "headers/safety_envelope.hpp"
 
 // Implementation code will be added here

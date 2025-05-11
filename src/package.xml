@@ -7,7 +7,7 @@
     A package for testing point inclusion within a safety envelope to prevent
     robot tooltips from leaving designated safe operational areas.
   </description>
-  <maintainer email="user@example.com">Your Name</maintainer>
+  <maintainer email="ollie.cj@gmail.com">Your Name</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
