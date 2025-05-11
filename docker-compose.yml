@@ -19,7 +19,8 @@ services:
     # Use bridge network instead of host for Windows compatibility
     networks:
       - ros2_net
-    command: bash
+    # Use a simple command that should work across architectures
+    entrypoint: ["tail", "-f", "/dev/null"]
     stdin_open: true  # Keep STDIN open
     tty: true  # Allocate a pseudo-TTY
 
