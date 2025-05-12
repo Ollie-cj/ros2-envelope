@@ -19,6 +19,7 @@ include_directories(
 # Create the safety envelope library
 add_library(${PROJECT_NAME}
   safety_envelope.cpp
+  microcontroller_stub.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -41,10 +42,37 @@ install(
   INCLUDES DESTINATION include
 )
 
+# Create executable for the safety envelope node
+add_executable(safety_envelope_node
+  safety_envelope.cpp
+)
+
+target_include_directories(safety_envelope_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/headers>
+  $<INSTALL_INTERFACE:include>
+)
+
+ament_target_dependencies(safety_envelope_node
+  rclcpp
+  geometry_msgs
+)
+
 # Install header files
 install(
   FILES headers/safety_envelope.hpp
   DESTINATION include/${PROJECT_NAME}
+)
+
+# Install documentation
+install(
+  FILES safety_envelope_notes.md
+  DESTINATION share/${PROJECT_NAME}/doc
+)
+
+# Install executables
+install(
+  TARGETS safety_envelope_node
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 # Export package information
