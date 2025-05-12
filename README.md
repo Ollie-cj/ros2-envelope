@@ -1,94 +1,79 @@
-# ROS2 Docker Development Environment
+# Haptic Safety Envelope System
 
-This project provides a Docker-based development environment for ROS2 (Robot Operating System 2) using the Jazzy distribution.
+A ROS2 node that ingests tool pose, checks against a virtual boundary, and publishes a stop flag in less than 10 ms.
 
-## Prerequisites
+## Overview
 
-- [Docker](https://www.docker.com/products/docker-desktop) installed and running
-- [Docker Compose](https://docs.docker.com/compose/install/) installed (included with Docker Desktop for Windows)
-- For Windows users: PowerShell
+This project implements a safety envelope system for haptic devices or robotic tools. The system monitors the position of a tool and checks if it stays within a predefined safety boundary. If the tool moves outside the boundary, the system immediately publishes a stop signal to prevent potential hazards.
 
-## Project Structure
+Key features:
+- Real-time performance with processing time under 10 ms
+- Watchdog mechanism to detect communication failures
+- Comprehensive safety considerations following medical device standards
+- Microcontroller-compatible implementation
 
-- `Dockerfile`: Defines the ROS2 development environment
-- `docker-compose.yml`: Configures the Docker services for ROS2 development
-- `ros2_docker.ps1`: PowerShell script for Windows users to manage the Docker environment
-- `ros2_docker.sh`: Bash script for Linux/macOS users (optional on Windows)
-- `src/`: Directory for your ROS2 packages (will be mounted into the container)
+## Components
 
-## Getting Started on Windows
+- **SafetyEnvelope Class**: A ROS2 node that subscribes to tool pose messages, checks against safety boundaries, and publishes stop flags
+- **Microcontroller Stub**: A simplified implementation suitable for deployment on microcontrollers
+- **Safety Notes**: Documentation on deterministic scheduling, watchdogs, and IEC 62304 artifacts
 
-1. Make sure Docker Desktop is running
-2. Open PowerShell in the project directory
-3. Build the Docker image:
-   ```
-   .\ros2_docker.ps1 build
-   ```
-4. Start an interactive ROS2 development session:
-   ```
-   .\ros2_docker.ps1 start
-   ```
-5. Inside the container, you can create and build ROS2 packages:
-   ```bash
-   # Create a new ROS2 package (inside the container)
-   cd /ros2_ws/src
-   ros2 pkg create --build-type ament_cmake my_package
-   
-   # Build the workspace
-   cd /ros2_ws
-   colcon build
-   
-   # Source the workspace
-   source /ros2_ws/install/setup.bash
-   
-   # Run your ROS2 nodes
-   ros2 run my_package my_node
-   ```
+## Building the Project
 
-## Helper Script Commands
+The project uses Docker to provide a consistent build environment. To build the project:
 
-The `ros2_docker.ps1` script provides several commands to help manage your ROS2 development environment:
+```bash
+# Build the Docker image
+./ros2_docker.ps1 build
 
-- `.\ros2_docker.ps1 build`: Build the Docker image
-- `.\ros2_docker.ps1 start`: Start an interactive ROS2 development session
-- `.\ros2_docker.ps1 run 'command'`: Run a specific command in the container
-- `.\ros2_docker.ps1 test`: Run the ROS2 demo test script
-- `.\ros2_docker.ps1 clean`: Clean up Docker resources
+# Start the Docker container
+./ros2_docker.ps1 start
 
-## GUI Applications on Windows
+# Inside the Docker container, build the project
+cd /ros2_ws
+colcon build
+source install/setup.bash
+```
 
-Running GUI applications from ROS2 (like RViz or Gazebo) on Windows requires additional setup:
+## Running the Safety Envelope Node
 
-1. Install an X Server for Windows, such as [VcXsrv](https://sourceforge.net/projects/vcxsrv/)
-2. Start the X Server with the following settings:
-   - Multiple windows
-   - Display number: 0
-   - Start no client
-   - Disable access control (check this option)
-3. Find your IP address using PowerShell:
-   ```
-   ipconfig
-   ```
-4. Create a `.env` file in the project directory with:
-   ```
-   DISPLAY=YOUR_IP_ADDRESS:0.0
-   ```
-5. Update the docker-compose.yml file to include:
-   ```yaml
-   environment:
-     - DISPLAY=${DISPLAY}
-     - QT_X11_NO_MITSHM=1
-   ```
+To run the safety envelope node:
 
-## Development Workflow
+```bash
+# Inside the Docker container
+ros2 run safety_envelope safety_envelope_node
+```
 
-1. Edit your ROS2 code in the `src/` directory using your favorite editor on Windows
-2. Build and test your code inside the Docker container
-3. Any changes you make to files in the `src/` directory will be immediately available inside the container
-4. Build artifacts are stored in persistent volumes, so rebuilds are faster
+## Testing
 
-## Troubleshooting
+You can test the safety envelope by publishing tool pose messages:
 
-- If you encounter permission issues, make sure Docker Desktop has access to the drive where your project is located
-- For networking issues, check that the required ports (11311, 9090) are not blocked by your firewall
-- If GUI applications don't display, check that your X Server is running and properly configured
+```bash
+# Publish a pose within the boundary
+ros2 topic pub /tool/pose geometry_msgs/msg/PoseStamped '{header: {frame_id: "base_link"}, pose: {position: {x: 0.0, y: 0.0, z: 0.0}}}'
+
+# Publish a pose outside the boundary
+ros2 topic pub /tool/pose geometry_msgs/msg/PoseStamped '{header: {frame_id: "base_link"}, pose: {position: {x: 1.0, y: 0.0, z: 0.0}}}'
+```
+
+Check the stop flag:
+
+```bash
+ros2 topic echo /safety/stop_flag
+```
+
+## Performance Monitoring
+
+The node logs performance metrics including processing time. You can monitor these metrics using:
+
+```bash
+ros2 run rqt_console rqt_console
+```
+
+## Safety Considerations
+
+For detailed information on safety considerations, including deterministic scheduling, watchdogs, and IEC 62304 artifacts, see the [safety_notes.md](src/safety_notes.md) document.
+
+## License
+
+Apache License 2.0
