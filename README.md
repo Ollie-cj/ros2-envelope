@@ -12,11 +12,46 @@ Key features:
 - Comprehensive safety considerations following medical device standards
 - Microcontroller-compatible implementation
 
+## Project Structure
+
+```
+project-geonosis/
+├── .gitignore
+├── docker-compose.yml
+├── Dockerfile
+├── README.md
+├── ros2_docker.ps1
+├── ros2_docker.sh
+└── src/
+    └── safety_envelope/         # Main ROS2 package
+        ├── CMakeLists.txt       # Build configuration
+        ├── package.xml          # Package metadata
+        ├── README.md            # Package-specific documentation
+        ├── include/             # Header files
+        │   └── safety_envelope/
+        │       └── safety_envelope.hpp
+        ├── src/                 # Source files
+        │   ├── safety_envelope.cpp       # Main implementation
+        │   ├── safety_envelope_node.cpp  # Node executable
+        │   └── microcontroller_stub.cpp  # Microcontroller implementation
+        ├── launch/              # Launch files
+        │   └── safety_envelope.launch.py
+        ├── config/              # Configuration files
+        │   └── default_boundaries.yaml
+        ├── doc/                 # Documentation
+        │   └── safety_envelope_notes.md
+        └── test/                # Unit tests
+            └── test_safety_envelope.cpp
+```
+
 ## Components
 
 - **SafetyEnvelope Class**: A ROS2 node that subscribes to tool pose messages, checks against safety boundaries, and publishes stop flags
 - **Microcontroller Stub**: A simplified implementation suitable for deployment on microcontrollers
 - **Safety Notes**: Documentation on deterministic scheduling, watchdogs, and IEC 62304 artifacts
+- **Launch Files**: Easy-to-use launch configuration for the safety envelope node
+- **Configuration Files**: YAML-based configuration for boundary parameters
+- **Unit Tests**: Comprehensive tests for the safety envelope functionality
 
 ## Building the Project
 
@@ -41,8 +76,14 @@ To run the safety envelope node:
 
 ```bash
 # Inside the Docker container
+# Method 1: Using the executable directly
 ros2 run safety_envelope safety_envelope_node
+
+# Method 2: Using the launch file (recommended)
+ros2 launch safety_envelope safety_envelope.launch.py
 ```
+
+The launch file method is recommended as it automatically loads the configuration from the default_boundaries.yaml file.
 
 ## Testing
 
@@ -72,7 +113,7 @@ ros2 run rqt_console rqt_console
 
 ## Safety Considerations
 
-For detailed information on safety considerations, including deterministic scheduling, watchdogs, and IEC 62304 artifacts, see the [safety_notes.md](src/safety_notes.md) document.
+For detailed information on safety considerations, including deterministic scheduling, watchdogs, and IEC 62304 artifacts, see the [safety_envelope_notes.md](src/safety_envelope/doc/safety_envelope_notes.md) document.
 
 ## License
 

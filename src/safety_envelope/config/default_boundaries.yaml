@@ -1,0 +1,23 @@
+# Default safety boundary configuration
+
+safety_envelope:
+  ros__parameters:
+    # Topic configuration
+    topic:
+      tool_pose: "/tool/pose"
+      stop_flag: "/safety/stop_flag"
+    
+    # Watchdog configuration
+    watchdog:
+      period_ms: 100
+    
+    # Boundary configuration
+    boundary:
+      min:
+        x: -0.5
+        y: -0.5
+        z: -0.5
+      max:
+        x: 0.5
+        y: 0.5
+        z: 0.5

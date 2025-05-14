@@ -13,17 +13,17 @@ find_package(geometry_msgs REQUIRED)
 
 # Add include directories
 include_directories(
-  headers
+  include
 )
 
 # Create the safety envelope library
 add_library(${PROJECT_NAME}
-  safety_envelope.cpp
-  microcontroller_stub.cpp
+  src/safety_envelope.cpp
+  src/microcontroller_stub.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/headers>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
 
@@ -44,11 +44,11 @@ install(
 
 # Create executable for the safety envelope node
 add_executable(safety_envelope_node
-  safety_envelope.cpp
+  src/safety_envelope_node.cpp
 )
 
 target_include_directories(safety_envelope_node PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/headers>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
 
@@ -57,16 +57,32 @@ ament_target_dependencies(safety_envelope_node
   geometry_msgs
 )
 
+target_link_libraries(safety_envelope_node
+  ${PROJECT_NAME}
+)
+
 # Install header files
 install(
-  FILES headers/safety_envelope.hpp
-  DESTINATION include/${PROJECT_NAME}
+  DIRECTORY include/
+  DESTINATION include
 )
 
 # Install documentation
 install(
-  FILES safety_envelope_notes.md
+  DIRECTORY doc/
   DESTINATION share/${PROJECT_NAME}/doc
+)
+
+# Install configuration files
+install(
+  DIRECTORY config/
+  DESTINATION share/${PROJECT_NAME}/config
+)
+
+# Install launch files
+install(
+  DIRECTORY launch/
+  DESTINATION share/${PROJECT_NAME}/launch
 )
 
 # Install executables
@@ -74,6 +90,28 @@ install(
   TARGETS safety_envelope_node
   DESTINATION lib/${PROJECT_NAME}
 )
+
+# Tests
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+  
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(test_safety_envelope
+    test/test_safety_envelope.cpp
+  )
+  target_include_directories(test_safety_envelope PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+  )
+  ament_target_dependencies(test_safety_envelope
+    rclcpp
+    geometry_msgs
+  )
+  target_link_libraries(test_safety_envelope
+    ${PROJECT_NAME}
+  )
+endif()
 
 # Export package information
 ament_export_include_directories(include)

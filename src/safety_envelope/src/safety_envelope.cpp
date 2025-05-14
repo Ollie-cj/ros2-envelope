@@ -16,7 +16,7 @@
  * and prevent the robot tooltip from leaving the designated safe operational area.
  */
 
-#include "headers/safety_envelope.hpp"
+#include "../include/safety_envelope/safety_envelope.hpp"
 #include <algorithm>
 #include <cmath>
 
@@ -219,26 +219,3 @@ Point3D SafetyEnvelope::convertToPoint3D(const geometry_msgs::msg::Point& point)
 }
 
 } // namespace safety
-
-// Main function to demonstrate how to use the SafetyEnvelope class
-int main(int argc, char** argv) {
-    // Initialize ROS2
-    rclcpp::init(argc, argv);
-    
-    // Create a default safety boundary
-    safety::BoundaryBox default_boundary{
-        safety::Point3D{-0.5, -0.5, -0.5},  // min corner
-        safety::Point3D{0.5, 0.5, 0.5}      // max corner
-    };
-    
-    // Create the safety envelope node
-    auto node = std::make_shared<safety::SafetyEnvelope>(default_boundary);
-    
-    // Spin the node
-    rclcpp::spin(node);
-    
-    // Shutdown ROS2
-    rclcpp::shutdown();
-    
-    return 0;
-}
